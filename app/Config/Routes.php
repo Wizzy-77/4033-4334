@@ -7,6 +7,20 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
+
+$routes->get('livraisons', 'LivraisonController::index');
+$routes->get('livraisons/historique', 'LivraisonController::historique');
+$routes->get('livraisons/create', 'LivraisonController::create');
+$routes->post('livraisons/store', 'LivraisonController::store');
+$routes->get('livraisons/status/(:num)/(:any)', 'LivraisonController::updateStatut/$1/$2');
+$routes->get('livraisons/ajax', 'LivraisonController::ajaxList');
+$routes->get('livreurs', 'LivreurController::index');
+$routes->post('livreurs/store', 'LivreurController::store');
+$routes->get('livreurs/edit/(:num)', 'LivreurController::edit/$1');
+$routes->post('livreurs/update/(:num)', 'LivreurController::update/$1');
+
+
+
 $routes->get('/employes/ajax', 'EmployeController::ajaxList');
 
 $routes->get('employes/index', 'EmployeController::index');
