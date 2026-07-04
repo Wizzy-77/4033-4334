@@ -42,10 +42,10 @@
   </div>
 
   <div class="row g-3">
-    <div class="col-6 col-lg-3"><a href="gestion-stock.html" class="module-card"><div class="module-icon orange"><i class="fa fa-boxes-stacked"></i></div><div class="module-name">Stock (2L / 35 unités)</div></a></div>
-    <div class="col-6 col-lg-3"><a href="employes.html" class="module-card"><div class="module-icon blue"><i class="fa fa-users"></i></div><div class="module-name">5 Employés actifs</div></a></div>
-    <div class="col-6 col-lg-3"><a href="distribution.html" class="module-card"><div class="module-icon green"><i class="fa fa-truck"></i></div><div class="module-name">Distribution (1 en cours)</div></a></div>
-    <div class="col-6 col-lg-3"><a href="statistiques-vente.html" class="module-card"><div class="module-icon red"><i class="fa fa-chart-pie"></i></div><div class="module-name">Performances ventes</div></a></div>
+    <div class="col-6 col-lg-3"><a href="gestion-stock" class="module-card"><div class="module-icon orange"><i class="fa fa-boxes-stacked"></i></div><div class="module-name">Stock (2L / 35 unités)</div></a></div>
+    <div class="col-6 col-lg-3"><a href="employes" class="module-card"><div class="module-icon blue"><i class="fa fa-users"></i></div><div class="module-name">5 Employés actifs</div></a></div>
+    <div class="col-6 col-lg-3"><a href="distribution" class="module-card"><div class="module-icon green"><i class="fa fa-truck"></i></div><div class="module-name">Distribution (1 en cours)</div></a></div>
+    <div class="col-6 col-lg-3"><a href="statistiques-vente" class="module-card"><div class="module-icon red"><i class="fa fa-chart-pie"></i></div><div class="module-name">Performances ventes</div></a></div>
   </div>
 </main>
 <script src="assets/bootstrap/bootstrap.bundle.min.js"></script>

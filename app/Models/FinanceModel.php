@@ -89,7 +89,7 @@ class FinanceModel extends Model
                 TO_CHAR(date_transaction, 'YYYY-MM') AS mois,
                 type,
                 SUM(montant) AS total
-            FROM transactions
+            FROM mouvements_financiers
             GROUP BY mois, type
             ORDER BY mois ASC
         ");

@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 
 class ContratModel extends Model
 {
-    protected $table      = 'contrat';
+    protected $table      = 'contrats';
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
@@ -24,7 +24,7 @@ class ContratModel extends Model
    
     public function getListe(string $recherche = '', ?int $statutId = null): array
     {
-        $builder = $this->db->table('contrat c');
+        $builder = $this->db->table('contrats c');
 
         $builder->select('c.id, c.sujet, c.date_creation, e.nom AS entreprise_nom, s.id AS statut_id, s.nom AS statut_nom');
         $builder->join('entreprise e', 'e.id = c.entreprise_id');
@@ -53,7 +53,7 @@ class ContratModel extends Model
     
     public function getDetail(int $id): ?array
     {
-        $builder = $this->db->table('contrat c');
+        $builder = $this->db->table('contrats c');
 
         $builder->select('c.*, e.nom AS entreprise_nom, e.telephone AS entreprise_telephone, e.email AS entreprise_email, s.nom AS statut_nom');
         $builder->join('entreprise e', 'e.id = c.entreprise_id');

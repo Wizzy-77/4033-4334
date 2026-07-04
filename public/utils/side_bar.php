@@ -12,14 +12,12 @@
         <a href="transformations" class="nav-subitem">Transformations (mise en bocal)</a>
         <a href="sorties" class="nav-subitem">Sorties (ventes)</a>
         <a href="valeur-stock" class="nav-subitem">Valeur du stock</a>
-        <a href="statistiques" class="nav-subitem">Statistiques</a>
-        <a href="finances" class="nav-subitem">Finances</a>
       </div>
     </div>
     <a href="contrat" class="nav-item-main"><i class="fa fa-file-contract nav-icon"></i> Gestion de contrat</a>
     <a href="employes" class="nav-item-main"><i class="fa fa-users nav-icon"></i> Gestion Employés</a>
-    <a href="finance-vente" class="nav-item-main"><i class="fa fa-circle-dollar-to-slot nav-icon"></i> Finance</a>
-    <a href="statistiques-vente" class="nav-item-main"><i class="fa fa-chart-line nav-icon"></i> Statistiques vente</a>
+    <a href="finances" class="nav-item-main"><i class="fa fa-circle-dollar-to-slot nav-icon"></i> Finance</a>
+    <a href="statistiques" class="nav-item-main"><i class="fa fa-chart-line nav-icon"></i> Statistiques vente</a>
     <a href="livraisons" class="nav-item-main"><i class="fa fa-truck nav-icon"></i> Distribution</a>
     <a href="emploi-temps" class="nav-item-main"><i class="fa fa-calendar-days nav-icon"></i> Emploi du temps</a>
   </nav>

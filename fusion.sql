@@ -77,19 +77,18 @@ CREATE TABLE planning (
     description TEXT
 );
 
+-- novaiko le tableau contrats de napiako tableau entreprise sy statut xxxxxxxxxxxxxxxx
+DROP TABLE contrats CASCADE;
+
 CREATE TABLE contrats (
-    id SERIAL PRIMARY KEY,
-    sujet VARCHAR(200) NOT NULL,
-    entreprise VARCHAR(150) NOT NULL,
-    contact VARCHAR(150),
-    email VARCHAR(150),
-    telephone VARCHAR(50),
-    description TEXT,
-    date_creation TIMESTAMP DEFAULT NOW(),
-    date_signature DATE,
-    date_expiration DATE,
-    statut VARCHAR(50) DEFAULT 'PENDING',
-    fichier_contrat TEXT
+    id               SERIAL PRIMARY KEY,
+    sujet            VARCHAR(200) NOT NULL,
+    entreprise_id    INT NOT NULL REFERENCES entreprise(id),
+    statut_id        INT NOT NULL REFERENCES statut(id),
+    description      TEXT,
+    date_signature   DATE,
+    date_expiration  DATE,
+    date_creation    TIMESTAMP DEFAULT NOW()
 );
 
 -- ============================================================================
@@ -274,3 +273,26 @@ SELECT id, 0 FROM types_bocaux;
 
 INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, role_id) VALUES
 ('Administrateur', 'AROVIA', 'admin@arovia.com', '$2y$10$changeme', 1);
+
+
+
+-- Table entreprise
+CREATE TABLE entreprise (
+    id        SERIAL PRIMARY KEY,
+    nom       VARCHAR(200) NOT NULL,
+    telephone VARCHAR(50),
+    email     VARCHAR(150)
+);
+
+-- Table statut
+CREATE TABLE statut (
+    id  SERIAL PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL
+);
+
+-- Statuts de base
+INSERT INTO statut (nom) VALUES
+    ('En cours'),
+    ('Signé'),
+    ('Expiré'),
+    ('Annulé');
