@@ -24,8 +24,21 @@ class Transformations extends BaseController
 
     public function index()
     {
+        $transformations = $this->transformationModel->getHistorique();
+
         $data['stockMP'] = $this->stockMPModel->getEtatStock();
         $data['stockPF'] = $this->stockPFModel->getStockAvecTypes();
+        $data['transformations'] = $transformations;
+        $data['totalTransformations'] = count($transformations);
+        $data['litresTransformes'] = array_sum(array_column($transformations, 'quantite_litres_utilisee'));
+        $data['bocauxProduits'] = array_sum(array_column($transformations, 'total_bocaux'));
+        $data['perteTotale'] = array_reduce($transformations, function ($carry, $item) {
+            $volumeProduit = ($item['total_bocaux'] ?? 0) * ($item['volume_bocal_litres'] ?? 0);
+            return $carry + max(0, ($item['quantite_litres_utilisee'] ?? 0) - $volumeProduit);
+        }, 0);
+        $data['tauxPerte'] = $data['litresTransformes'] > 0
+            ? round(($data['perteTotale'] / $data['litresTransformes']) * 100, 2)
+            : 0;
 
         return view('transformations/index', $data);
     }

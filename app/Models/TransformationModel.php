@@ -14,6 +14,73 @@ class TransformationModel extends Model
     protected $useTimestamps = false;
 
     /**
+     * Récupère l'historique des transformations avec le nombre de bocaux produits.
+     */
+    public function getHistorique(): array
+    {
+        $db = \Config\Database::connect();
+
+        if (! $db->tableExists('transformations')) {
+            return [];
+        }
+
+        $transformations = $db->table('transformations as t')
+            ->select('t.id, t.date_transformation, t.quantite_litres_utilisee, t.cump_applique, t.valeur_sortie')
+            ->orderBy('t.date_transformation', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $details = [];
+        if ($db->tableExists('transformations_detail') && $db->tableExists('types_bocaux')) {
+            $details = $db->table('transformations_detail as td')
+                ->select('td.transformation_id, td.quantite_produite, tb.nom, tb.volume_litres')
+                ->join('types_bocaux as tb', 'tb.id = td.type_bocal_id', 'left')
+                ->get()
+                ->getResultArray();
+        }
+
+        $detailsParTransformation = [];
+        foreach ($details as $detail) {
+            $id = $detail['transformation_id'];
+            if (! isset($detailsParTransformation[$id])) {
+                $detailsParTransformation[$id] = [
+                    'total_bocaux' => 0,
+                    'volume_bocal_litres' => 0,
+                    'bocal_noms' => [],
+                ];
+            }
+
+            $detailsParTransformation[$id]['total_bocaux'] += (int) ($detail['quantite_produite'] ?? 0);
+            $detailsParTransformation[$id]['volume_bocal_litres'] = max(
+                $detailsParTransformation[$id]['volume_bocal_litres'],
+                (float) ($detail['volume_litres'] ?? 0)
+            );
+
+            if (! empty($detail['nom'])) {
+                $detailsParTransformation[$id]['bocal_noms'][] = $detail['nom'];
+            }
+        }
+
+        foreach ($transformations as &$transformation) {
+            $id = $transformation['id'];
+            $detailsTransformation = $detailsParTransformation[$id] ?? [
+                'total_bocaux' => 0,
+                'volume_bocal_litres' => 0,
+                'bocal_noms' => [],
+            ];
+
+            $transformation['total_bocaux'] = $detailsTransformation['total_bocaux'];
+            $transformation['volume_bocal_litres'] = $detailsTransformation['volume_bocal_litres'];
+            $transformation['bocal_noms'] = implode(array_unique($detailsTransformation['bocal_noms']), ', ');
+            if ($transformation['bocal_noms'] === '') {
+                $transformation['bocal_noms'] = '—';
+            }
+        }
+
+        return $transformations;
+    }
+
+    /**
      * Enregistre une transformation (mise en bocal).
      *
      * @param array $repartition Tableau [type_bocal_id => quantite_a_produire]

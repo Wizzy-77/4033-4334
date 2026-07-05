@@ -18,9 +18,9 @@
   </div>
   
   <div class="row g-3 mb-4">
-    <div class="col-6 col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap blue"><i class="fa fa-file-signature"></i></div><div class="kpi-label">Contrats actifs</div><div class="kpi-value dark">1</div></div></div>
-    <div class="col-6 col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap orange"><i class="fa fa-hourglass-half"></i></div><div class="kpi-label">En attente</div><div class="kpi-value orange">0</div></div></div>
-    <div class="col-6 col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap red"><i class="fa fa-circle-xmark"></i></div><div class="kpi-label">Expirés</div><div class="kpi-value red">0</div></div></div>
+    <div class="col-6 col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap blue"><i class="fa fa-file-signature"></i></div><div class="kpi-label">Contrats actifs</div><div class="kpi-value dark"><?= count(array_filter($contrats ?? [], fn($c) => ($c['statut_nom'] ?? '') === 'Actif')) ?></div></div></div>
+    <div class="col-6 col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap orange"><i class="fa fa-hourglass-half"></i></div><div class="kpi-label">En attente</div><div class="kpi-value orange"><?= count(array_filter($contrats ?? [], fn($c) => ($c['statut_nom'] ?? '') === 'En attente')) ?></div></div></div>
+    <div class="col-6 col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap red"><i class="fa fa-circle-xmark"></i></div><div class="kpi-label">Expirés</div><div class="kpi-value red"><?= count(array_filter($contrats ?? [], fn($c) => ($c['statut_nom'] ?? '') === 'Expiré')) ?></div></div></div>
   </div>
 
   <div class="content-card">
@@ -29,17 +29,22 @@
         <tr><th>Partenaire</th><th>Type</th><th>Date début</th><th>Date fin</th><th>Statut</th><th>Actions</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><span class="table-avatar">R</span> Rakoto (Fournisseur)</td>
-          <td>Approvisionnement</td>
-          <td>01/01/2026</td>
-          <td>31/12/2026</td>
-          <td><span class="badge-arovia badge-green">Actif</span></td>
-          <td>
-            <button class="btn-icon-edit" title="Voir/Modifier"><i class="fa fa-eye"></i></button>
-            <button class="btn-icon-delete ms-1"><i class="fa fa-trash"></i></button>
-          </td>
-        </tr>
+        <?php if (!empty($contrats)): ?>
+          <?php foreach ($contrats as $contrat): ?>
+            <tr>
+              <td><span class="table-avatar"><?= esc(strtoupper(substr($contrat['entreprise_nom'] ?? 'C', 0, 1))) ?></span> <?= esc($contrat['entreprise_nom'] ?? '—') ?></td>
+              <td><?= esc($contrat['sujet'] ?? '—') ?></td>
+              <td><?= esc($contrat['date_signature'] ? date('d/m/Y', strtotime($contrat['date_signature'])) : '—') ?></td>
+              <td><?= esc($contrat['date_expiration'] ? date('d/m/Y', strtotime($contrat['date_expiration'])) : '—') ?></td>
+              <td><span class="badge-arovia badge-green"><?= esc($contrat['statut_nom'] ?? '—') ?></span></td>
+              <td>
+                <a class="btn-icon-edit" href="/contrat/detail/<?= (int) ($contrat['id'] ?? 0) ?>" title="Voir"><i class="fa fa-eye"></i></a>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr><td colspan="6" class="text-center text-muted" style="padding:2rem">Aucun contrat enregistré.</td></tr>
+        <?php endif; ?>
       </tbody>
     </table>
   </div>

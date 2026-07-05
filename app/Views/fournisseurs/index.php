@@ -40,34 +40,28 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>
-            <div style="display:flex;align-items:center;gap:.5rem">
-              <span class="table-avatar">R</span>
-              Rakoto
-            </div>
-          </td>
-          <td><i class="fa fa-envelope table-info-icon"></i> rakoto@gmail.com</td>
-          <td><i class="fa fa-location-dot table-info-icon"></i> Andoharanofotsy</td>
-          <td>
-            <button class="btn-icon-edit" title="Modifier"><i class="fa fa-pen"></i></button>
-            <button class="btn-icon-delete ms-1" title="Supprimer"><i class="fa fa-trash"></i></button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div style="display:flex;align-items:center;gap:.5rem">
-              <span class="table-avatar" style="background:var(--accent-blue)">M</span>
-              Miaro
-            </div>
-          </td>
-          <td><i class="fa fa-envelope table-info-icon"></i> miaro@arovia.mg</td>
-          <td><i class="fa fa-location-dot table-info-icon"></i> Ambatolampy</td>
-          <td>
-            <button class="btn-icon-edit" title="Modifier"><i class="fa fa-pen"></i></button>
-            <button class="btn-icon-delete ms-1" title="Supprimer"><i class="fa fa-trash"></i></button>
-          </td>
-        </tr>
+        <?php if (!empty($fournisseurs)): ?>
+          <?php foreach ($fournisseurs as $fournisseur): ?>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:.5rem">
+                  <span class="table-avatar"><?= esc(strtoupper(substr($fournisseur['nom'] ?? 'F', 0, 1))) ?></span>
+                  <?= esc($fournisseur['nom'] ?? '—') ?>
+                </div>
+              </td>
+              <td><i class="fa fa-envelope table-info-icon"></i> <?= esc($fournisseur['contact'] ?? '—') ?></td>
+              <td><i class="fa fa-location-dot table-info-icon"></i> <?= esc($fournisseur['localisation'] ?? '—') ?></td>
+              <td>
+                <a class="btn-icon-edit" href="/fournisseurs/<?= (int) ($fournisseur['id'] ?? 0) ?>/edit" title="Modifier"><i class="fa fa-pen"></i></a>
+                <a class="btn-icon-delete ms-1" href="/fournisseurs/<?= (int) ($fournisseur['id'] ?? 0) ?>/delete" title="Supprimer" onclick="return confirm('Supprimer ce fournisseur ?')"><i class="fa fa-trash"></i></a>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr>
+            <td colspan="4" class="text-center text-muted" style="padding:2rem">Aucun fournisseur enregistré.</td>
+          </tr>
+        <?php endif; ?>
       </tbody>
     </table>
 
@@ -98,28 +92,26 @@
         <h5 class="modal-title">Ajouter un fournisseur</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="arovia-label">Nom *</label>
-          <input type="text" class="arovia-input" placeholder="Nom du fournisseur"/>
+      <form method="post" action="/fournisseurs">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="arovia-label" for="nom">Nom *</label>
+            <input id="nom" name="nom" type="text" class="arovia-input" placeholder="Nom du fournisseur" required/>
+          </div>
+          <div class="mb-3">
+            <label class="arovia-label" for="contact">Contact</label>
+            <input id="contact" name="contact" type="text" class="arovia-input" placeholder="email@exemple.com"/>
+          </div>
+          <div class="mb-3">
+            <label class="arovia-label" for="localisation">Localisation</label>
+            <input id="localisation" name="localisation" type="text" class="arovia-input" placeholder="Ville / Quartier"/>
+          </div>
         </div>
-        <div class="mb-3">
-          <label class="arovia-label">Email</label>
-          <input type="email" class="arovia-input" placeholder="email@exemple.com"/>
+        <div class="modal-footer">
+          <button type="button" class="btn-outline-gold" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn-gold">Enregistrer</button>
         </div>
-        <div class="mb-3">
-          <label class="arovia-label">Téléphone</label>
-          <input type="tel" class="arovia-input" placeholder="+261 XX XX XXX XX"/>
-        </div>
-        <div class="mb-3">
-          <label class="arovia-label">Localisation</label>
-          <input type="text" class="arovia-input" placeholder="Ville / Quartier"/>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn-outline-gold" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn-gold">Enregistrer</button>
-      </div>
+      </form>
     </div>
   </div>
 </div>

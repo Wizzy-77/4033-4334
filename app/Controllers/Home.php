@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\StockMatierePremiereModel;
 use App\Models\StockProduitFiniModel;
 use App\Models\FournisseurModel;
+use App\Models\EmployeModel;
 
 class Home extends BaseController
 {
@@ -13,10 +14,12 @@ class Home extends BaseController
         $stockMPModel = new StockMatierePremiereModel();
         $stockPFModel = new StockProduitFiniModel();
         $fournisseurModel = new FournisseurModel();
+        $employeModel = new EmployeModel();
 
         $data['stockMP']        = $stockMPModel->getEtatStock();
         $data['stockPF']        = $stockPFModel->getStockAvecTypes();
         $data['nbFournisseurs'] = $fournisseurModel->countAll();
+        $data['nbEmployes']     = count($employeModel->getActifs());
 
         $data['totalBocaux'] = array_sum(array_column($data['stockPF'], 'quantite_disponible'));
 
@@ -28,10 +31,12 @@ class Home extends BaseController
         $stockMPModel = new StockMatierePremiereModel();
         $stockPFModel = new StockProduitFiniModel();
         $fournisseurModel = new FournisseurModel();
+        $employeModel = new EmployeModel();
 
         $data['stockMP']        = $stockMPModel->getEtatStock();
         $data['stockPF']        = $stockPFModel->getStockAvecTypes();
         $data['nbFournisseurs'] = $fournisseurModel->countAll();
+        $data['nbEmployes']     = count($employeModel->getActifs());
 
         $data['totalBocaux'] = array_sum(array_column($data['stockPF'], 'quantite_disponible'));
 

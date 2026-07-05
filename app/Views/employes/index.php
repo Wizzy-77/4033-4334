@@ -18,45 +18,49 @@
   </div>
   
   <div class="row g-3">
-    <!-- Exemple Card Employé -->
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="content-card d-flex flex-column align-items-center text-center">
-        <div class="table-avatar mb-3" style="width:72px;height:72px;font-size:1.8rem">J</div>
-        <h4 class="fw-700 text-dark-primary mb-1" style="font-size:1.1rem">Jean Randria</h4>
-        <div class="text-muted" style="font-size:.85rem">Livreur</div>
-        <div class="d-flex gap-2 mt-3 w-100">
-          <button class="btn-outline-gold flex-fill" style="justify-content:center"><i class="fa fa-envelope"></i> Message</button>
-          <button class="btn-icon-edit"><i class="fa fa-pen"></i></button>
+    <?php if (!empty($employes)): ?>
+      <?php foreach ($employes as $employe): ?>
+        <?php $initiales = strtoupper(substr($employe['prenom'] ?? '', 0, 1) . substr($employe['nom'] ?? '', 0, 1)); ?>
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="content-card d-flex flex-column align-items-center text-center">
+            <div class="table-avatar mb-3" style="width:72px;height:72px;font-size:1.8rem"><?= esc($initiales ?: '?') ?></div>
+            <h4 class="fw-700 text-dark-primary mb-1" style="font-size:1.1rem"><?= esc(($employe['prenom'] ?? '') . ' ' . ($employe['nom'] ?? '')) ?></h4>
+            <div class="text-muted" style="font-size:.85rem"><?= esc($employe['poste'] ?? '—') ?></div>
+            <div class="d-flex gap-2 mt-3 w-100">
+              <a class="btn-outline-gold flex-fill text-center" href="/employes/show/<?= (int) ($employe['id'] ?? 0) ?>"><i class="fa fa-eye"></i> Voir</a>
+              <a class="btn-icon-edit" href="/employes/edit/<?= (int) ($employe['id'] ?? 0) ?>" title="Modifier"><i class="fa fa-pen"></i></a>
+            </div>
+          </div>
         </div>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <div class="col-12">
+        <div class="content-card text-center text-muted py-5">Aucun employé enregistré pour le moment.</div>
       </div>
-    </div>
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="content-card d-flex flex-column align-items-center text-center">
-        <div class="table-avatar mb-3" style="width:72px;height:72px;font-size:1.8rem;background:var(--accent-blue)">M</div>
-        <h4 class="fw-700 text-dark-primary mb-1" style="font-size:1.1rem">Marie Rasoa</h4>
-        <div class="text-muted" style="font-size:.85rem">Responsable Stock</div>
-        <div class="d-flex gap-2 mt-3 w-100">
-          <button class="btn-outline-gold flex-fill" style="justify-content:center"><i class="fa fa-envelope"></i> Message</button>
-          <button class="btn-icon-edit"><i class="fa fa-pen"></i></button>
-        </div>
-      </div>
-    </div>
+    <?php endif; ?>
   </div>
 </main>
 <!-- Modal -->
 <div class="modal fade" id="modalEmploye" tabindex="-1">
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Ajouter 
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Ajouter un employé</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <div class="mb-3"><label class="arovia-label">Nom complet *</label><input type="text" class="arovia-input"/></div>
-        <div class="mb-3"><label class="arovia-label">Poste *</label><input type="text" class="arovia-input"/></div>
-        <div class="mb-3"><label class="arovia-label">Email</label><input type="email" class="arovia-input"/></div>
-        <div class="mb-3"><label class="arovia-label">Téléphone</label><input type="tel" class="arovia-input"/></div>
-      </div>
-      <div class="modal-footer"><button class="btn-outline-gold" data-bs-dismiss="modal">Annuler</button><button class="btn-gold">Enregistrer</button></div>
+      <form method="post" action="/employes/store">
+        <div class="modal-header">
+          <h5 class="modal-title">Ajouter un employé</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="arovia-label" for="matricule">Matricule</label><input id="matricule" name="matricule" type="text" class="arovia-input"/></div>
+          <div class="mb-3"><label class="arovia-label" for="nom">Nom *</label><input id="nom" name="nom" type="text" class="arovia-input" required/></div>
+          <div class="mb-3"><label class="arovia-label" for="prenom">Prénom *</label><input id="prenom" name="prenom" type="text" class="arovia-input" required/></div>
+          <div class="mb-3"><label class="arovia-label" for="poste">Poste *</label><input id="poste" name="poste" type="text" class="arovia-input" required/></div>
+          <div class="mb-3"><label class="arovia-label" for="email">Email</label><input id="email" name="email" type="email" class="arovia-input"/></div>
+          <div class="mb-3"><label class="arovia-label" for="telephone">Téléphone</label><input id="telephone" name="telephone" type="tel" class="arovia-input"/></div>
+          <div class="mb-3"><label class="arovia-label" for="salaire_base">Salaire de base</label><input id="salaire_base" name="salaire_base" type="number" class="arovia-input"/></div>
+          <div class="mb-3"><label class="arovia-label" for="date_embauche">Date d'embauche</label><input id="date_embauche" name="date_embauche" type="date" class="arovia-input"/></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn-outline-gold" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn-gold">Enregistrer</button></div>
+      </form>
     </div>
   </div>
 </div>

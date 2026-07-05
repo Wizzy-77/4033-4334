@@ -39,18 +39,18 @@
             <?php foreach($livreurs as $liv): ?>
                 <div class="employee-card">
                     <div class="card-top">
-                        <span class="emp-matricule">ID: #<?= $liv['id'] ?></span>
-                        <span class="status-badge <?= $liv['disponible'] ? 'actif' : 'inactif' ?>">
-                            <?= $liv['disponible'] ? 'DISPONIBLE' : 'EN COURSE/ABSENT' ?>
+                        <span class="emp-matricule">ID: #<?= (int) ($liv['id'] ?? 0) ?></span>
+                        <span class="status-badge <?= !empty($liv['disponible']) ? 'actif' : 'inactif' ?>">
+                            <?= !empty($liv['disponible']) ? 'DISPONIBLE' : 'EN COURSE/ABSENT' ?>
                         </span>
                     </div>
                     <div class="card-body" style="margin-top:15px;">
-                        <h2 class="emp-name" style="font-size:18px;"><?= htmlspecialchars($liv['nom']) ?></h2>
-                        <p class="emp-poste" style="color:#63b3ed;">🛵 Véhicule : <?= htmlspecialchars($liv['vehicule']) ?></p>
-                        <p style="font-size: 13px; margin-top:5px; color:#cbd5e0;">📞 <?= htmlspecialchars($liv['telephone']) ?></p>
+                        <h2 class="emp-name" style="font-size:18px;"><?= esc($liv['nom'] ?? '—') ?></h2>
+                        <p class="emp-poste" style="color:#63b3ed;">🛵 Véhicule : <?= esc($liv['vehicule'] ?? '—') ?></p>
+                        <p style="font-size: 13px; margin-top:5px; color:#cbd5e0;">📞 <?= esc($liv['telephone'] ?? '—') ?></p>
                     </div>
                     <div class="card-actions" style="margin-top: 15px;">
-                        <a href="/livreurs/edit/<?= $liv['id'] ?>" class="btn-action btn-edit" style="width: 100%; text-align:center;">Modifier les infos</a>
+                        <a href="/livreurs/edit/<?= (int) ($liv['id'] ?? 0) ?>" class="btn-action btn-edit" style="width: 100%; text-align:center;">Modifier les infos</a>
                     </div>
                 </div>
             <?php endforeach; ?>

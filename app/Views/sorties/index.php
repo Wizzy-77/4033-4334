@@ -18,10 +18,10 @@
     <button class="btn-gold" data-bs-toggle="modal" data-bs-target="#modalSortie"><i class="fa fa-plus"></i> Nouvelle vente</button>
   </div>
   <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-icon-wrap red"><i class="fa fa-cart-shopping"></i></div><div class="kpi-label">Bocaux vendus</div><div class="kpi-value red">0</div></div></div>
-    <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-icon-wrap gold"><i class="fa fa-circle-dollar-to-slot"></i></div><div class="kpi-label">Chiffre d'affaires</div><div class="kpi-value gold">0 Ar</div></div></div>
-    <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-icon-wrap green"><i class="fa fa-jar"></i></div><div class="kpi-label">Stock restant</div><div class="kpi-value green">35</div></div></div>
-    <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-icon-wrap blue"><i class="fa fa-percent"></i></div><div class="kpi-label">Taux écoulement</div><div class="kpi-value blue">0%</div></div></div>
+    <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-icon-wrap red"><i class="fa fa-cart-shopping"></i></div><div class="kpi-label">Bocaux vendus</div><div class="kpi-value red"><?= array_sum(array_column($sorties ?? [], 'quantite')) ?></div></div></div>
+    <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-icon-wrap gold"><i class="fa fa-circle-dollar-to-slot"></i></div><div class="kpi-label">Chiffre d'affaires</div><div class="kpi-value gold"><?= number_format(array_sum(array_column($sorties ?? [], 'valeur_totale')), 0, ',', ' ') ?> Ar</div></div></div>
+    <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-icon-wrap green"><i class="fa fa-jar"></i></div><div class="kpi-label">Stock restant</div><div class="kpi-value green"><?= (int) array_sum(array_column($stockPF ?? [], 'quantite_disponible')) ?></div></div></div>
+    <div class="col-6 col-md-3"><div class="kpi-card"><div class="kpi-icon-wrap blue"><i class="fa fa-percent"></i></div><div class="kpi-label">Taux écoulement</div><div class="kpi-value blue"><?= count($sorties ?? []) > 0 ? number_format((array_sum(array_column($sorties ?? [], 'quantite')) / max(1, (int) array_sum(array_column($stockPF ?? [], 'quantite_disponible')) + array_sum(array_column($sorties ?? [], 'quantite')))) * 100, 2) : '0.00' ?>%</div></div></div>
   </div>
   <div class="content-card">
     <table class="arovia-table">
@@ -29,12 +29,21 @@
         <tr><th>Date</th><th>Client</th><th>Nb. bocaux</th><th>Prix unit. (Ar)</th><th>Total (Ar)</th><th>Statut</th><th>Actions</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">
-            <i class="fa fa-inbox" style="font-size:2rem;margin-bottom:.5rem;display:block"></i>
-            Aucune vente enregistrée
-          </td>
-        </tr>
+        <?php if (!empty($sorties)): ?>
+          <?php foreach ($sorties as $sortie): ?>
+            <tr>
+              <td><?= esc(date('d/m/Y', strtotime($sortie['date_sortie'] ?? 'now'))) ?></td>
+              <td><?= esc($sortie['destinataire_nom'] ?: ucfirst($sortie['destinataire_type'] ?? 'Client')) ?></td>
+              <td><?= (int) ($sortie['quantite'] ?? 0) ?></td>
+              <td><?= number_format($sortie['prix_vente_unitaire'] ?? 0, 0, ',', ' ') ?></td>
+              <td class="fw-600 text-orange"><?= number_format($sortie['valeur_totale'] ?? 0, 0, ',', ' ') ?></td>
+              <td><span class="badge-arovia badge-green"><?= esc(ucfirst($sortie['destinataire_type'] ?? 'Client')) ?></span></td>
+              <td><button class="btn-icon-edit" type="button"><i class="fa fa-pen"></i></button></td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)"><i class="fa fa-inbox" style="font-size:2rem;margin-bottom:.5rem;display:block"></i>Aucune vente enregistrée</td></tr>
+        <?php endif; ?>
       </tbody>
     </table>
     <div class="table-footer">
@@ -47,14 +56,21 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header"><h5 class="modal-title">Nouvelle vente</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <div class="mb-3"><label class="arovia-label">Date *</label><input type="date" class="arovia-input"/></div>
-        <div class="mb-3"><label class="arovia-label">Client</label><input type="text" class="arovia-input" placeholder="Nom du client"/></div>
-        <div class="mb-3"><label class="arovia-label">Nombre de bocaux *</label><input type="number" class="arovia-input" placeholder="0"/></div>
-        <div class="mb-3"><label class="arovia-label">Prix unitaire (Ar) *</label><input type="number" class="arovia-input" placeholder="0"/></div>
-        <div class="mb-3"><label class="arovia-label">Statut</label><select class="arovia-input"><option>Payé</option><option>En attente</option><option>Annulé</option></select></div>
-      </div>
-      <div class="modal-footer"><button class="btn-outline-gold" data-bs-dismiss="modal">Annuler</button><button class="btn-gold">Enregistrer</button></div>
+      <form method="post" action="/sorties">
+        <div class="modal-body">
+          <div class="mb-3"><label class="arovia-label" for="type_bocal_id">Type de bocal *</label><select id="type_bocal_id" name="type_bocal_id" class="arovia-input" required>
+            <option value="">Sélectionner...</option>
+            <?php foreach ($typesBocaux ?? [] as $type): ?>
+              <option value="<?= (int) ($type['id'] ?? 0) ?>"><?= esc($type['nom'] ?? 'Bocal') ?></option>
+            <?php endforeach; ?>
+          </select></div>
+          <div class="mb-3"><label class="arovia-label" for="quantite">Nombre de bocaux *</label><input id="quantite" name="quantite" type="number" class="arovia-input" placeholder="0" required/></div>
+          <div class="mb-3"><label class="arovia-label" for="destinataire_type">Destinataire *</label><select id="destinataire_type" name="destinataire_type" class="arovia-input" required><option value="touriste">Touriste</option><option value="particulier">Particulier</option><option value="hotel">Hôtel</option></select></div>
+          <div class="mb-3"><label class="arovia-label" for="destinataire_nom">Nom du client</label><input id="destinataire_nom" name="destinataire_nom" type="text" class="arovia-input" placeholder="Nom du client"/></div>
+          <div class="mb-3"><label class="arovia-label" for="prix_vente_unitaire">Prix unitaire (Ar) *</label><input id="prix_vente_unitaire" name="prix_vente_unitaire" type="number" step="0.01" class="arovia-input" placeholder="0" required/></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn-outline-gold" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn-gold">Enregistrer</button></div>
+      </form>
     </div>
   </div>
 </div>

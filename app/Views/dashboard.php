@@ -1,24 +1,24 @@
 <h1>Gestion de stock — Miel Arovia</h1>
 
 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
-    <div style="border: 1px solid #ccc; padding: 16px; width: 200px;">
+    <div style="border: 1px solid #ccc; padding: 16px; width: 220px;">
         <h4>Stock matière première</h4>
-        <p style="font-size: 24px; margin: 0;"><?= number_format($stockMP['quantite_litres'], 2) ?> L</p>
+        <p style="font-size: 24px; margin: 0;"><?= number_format($stockMP['quantite_litres'] ?? 0, 2) ?> L</p>
     </div>
 
-    <div style="border: 1px solid #ccc; padding: 16px; width: 200px;">
+    <div style="border: 1px solid #ccc; padding: 16px; width: 220px;">
         <h4>Bocaux disponibles</h4>
-        <p style="font-size: 24px; margin: 0;"><?= $totalBocaux ?></p>
+        <p style="font-size: 24px; margin: 0;"><?= (int) ($totalBocaux ?? 0) ?></p>
     </div>
 
-    <div style="border: 1px solid #ccc; padding: 16px; width: 200px;">
+    <div style="border: 1px solid #ccc; padding: 16px; width: 220px;">
         <h4>CUMP actuel</h4>
-        <p style="font-size: 24px; margin: 0;"><?= number_format($stockMP['cump_actuel'], 2) ?> Ar/L</p>
+        <p style="font-size: 24px; margin: 0;"><?= number_format($stockMP['cump_actuel'] ?? 0, 2) ?> Ar/L</p>
     </div>
 
-    <div style="border: 1px solid #ccc; padding: 16px; width: 200px;">
-        <h4>Fournisseurs</h4>
-        <p style="font-size: 24px; margin: 0;"><?= $nbFournisseurs ?></p>
+    <div style="border: 1px solid #ccc; padding: 16px; width: 220px;">
+        <h4>Fournisseurs / Employés</h4>
+        <p style="font-size: 24px; margin: 0;"><?= (int) ($nbFournisseurs ?? 0) ?> / <?= (int) ($nbEmployes ?? 0) ?></p>
     </div>
 </div>
 

@@ -20,16 +20,16 @@
   <!-- KPIs -->
   <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
-      <div class="kpi-card"><div class="kpi-icon-wrap green"><i class="fa fa-droplet"></i></div><div class="kpi-label">Total litres reçus</div><div class="kpi-value green">15.00 L</div></div>
+      <div class="kpi-card"><div class="kpi-icon-wrap green"><i class="fa fa-droplet"></i></div><div class="kpi-label">Total litres reçus</div><div class="kpi-value green"><?= number_format(array_sum(array_column($entrees ?? [], 'quantite_litres')), 2) ?> L</div></div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card"><div class="kpi-icon-wrap gold"><i class="fa fa-receipt"></i></div><div class="kpi-label">Nb. entrées</div><div class="kpi-value dark">1</div></div>
+      <div class="kpi-card"><div class="kpi-icon-wrap gold"><i class="fa fa-receipt"></i></div><div class="kpi-label">Nb. entrées</div><div class="kpi-value dark"><?= count($entrees ?? []) ?></div></div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card"><div class="kpi-icon-wrap orange"><i class="fa fa-circle-dollar-to-slot"></i></div><div class="kpi-label">Coût total</div><div class="kpi-value orange">75 000 Ar</div></div>
+      <div class="kpi-card"><div class="kpi-icon-wrap orange"><i class="fa fa-circle-dollar-to-slot"></i></div><div class="kpi-label">Coût total</div><div class="kpi-value orange"><?= number_format(array_sum(array_column($entrees ?? [], 'valeur_totale')), 0, ',', ' ') ?> Ar</div></div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card"><div class="kpi-icon-wrap blue"><i class="fa fa-calculator"></i></div><div class="kpi-label">CUMP</div><div class="kpi-value blue">5 000 Ar/L</div></div>
+      <div class="kpi-card"><div class="kpi-icon-wrap blue"><i class="fa fa-calculator"></i></div><div class="kpi-label">CUMP</div><div class="kpi-value blue"><?= number_format($stock['cump_actuel'] ?? 0, 0, ',', ' ') ?> Ar/L</div></div>
     </div>
   </div>
   <div class="content-card">
@@ -38,17 +38,23 @@
         <tr><th>Date</th><th>Fournisseur</th><th>Quantité (L)</th><th>Prix unit. (Ar)</th><th>Total (Ar)</th><th>Actions</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td>28/06/2026</td>
-          <td><span class="table-avatar">R</span> Rakoto</td>
-          <td><span class="badge-arovia badge-green">15.00 L</span></td>
-          <td>5 000</td>
-          <td class="fw-600 text-orange">75 000</td>
-          <td>
-            <button class="btn-icon-edit"><i class="fa fa-pen"></i></button>
-            <button class="btn-icon-delete ms-1"><i class="fa fa-trash"></i></button>
-          </td>
-        </tr>
+        <?php if (!empty($entrees)): ?>
+          <?php foreach ($entrees as $entree): ?>
+            <tr>
+              <td><?= esc(date('d/m/Y', strtotime($entree['date_entree'] ?? 'now'))) ?></td>
+              <td><span class="table-avatar"><?= esc(strtoupper(substr($entree['fournisseur_nom'] ?? 'F', 0, 1))) ?></span> <?= esc($entree['fournisseur_nom'] ?? '—') ?></td>
+              <td><span class="badge-arovia badge-green"><?= number_format($entree['quantite_litres'] ?? 0, 2) ?> L</span></td>
+              <td><?= number_format($entree['prix_unitaire'] ?? 0, 0, ',', ' ') ?></td>
+              <td class="fw-600 text-orange"><?= number_format($entree['valeur_totale'] ?? 0, 0, ',', ' ') ?></td>
+              <td>
+                <button class="btn-icon-edit" type="button"><i class="fa fa-pen"></i></button>
+                <button class="btn-icon-delete ms-1" type="button"><i class="fa fa-trash"></i></button>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr><td colspan="6" class="text-center text-muted" style="padding:2rem">Aucune entrée enregistrée.</td></tr>
+        <?php endif; ?>
       </tbody>
     </table>
     <div class="table-footer">
@@ -65,14 +71,21 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header"><h5 class="modal-title">Nouvelle entrée matière première</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <div class="mb-3"><label class="arovia-label">Date *</label><input type="date" class="arovia-input"/></div>
-        <div class="mb-3"><label class="arovia-label">Fournisseur *</label><select class="arovia-input"><option>Sélectionner...</option><option>Rakoto</option></select></div>
-        <div class="mb-3"><label class="arovia-label">Quantité (L) *</label><input type="number" class="arovia-input" placeholder="0.00"/></div>
-        <div class="mb-3"><label class="arovia-label">Prix unitaire (Ar/L) *</label><input type="number" class="arovia-input" placeholder="0"/></div>
-        <div class="mb-3"><label class="arovia-label">Notes</label><textarea class="arovia-input" rows="3" placeholder="Observations..."></textarea></div>
-      </div>
-      <div class="modal-footer"><button class="btn-outline-gold" data-bs-dismiss="modal">Annuler</button><button class="btn-gold">Enregistrer</button></div>
+      <form method="post" action="/entrees-matiere-premiere">
+        <div class="modal-body">
+          <div class="mb-3"><label class="arovia-label" for="fournisseur_id">Fournisseur *</label>
+            <select id="fournisseur_id" name="fournisseur_id" class="arovia-input" required>
+              <option value="">Sélectionner...</option>
+              <?php foreach ($fournisseurs ?? [] as $fournisseur): ?>
+                <option value="<?= (int) ($fournisseur['id'] ?? 0) ?>"><?= esc($fournisseur['nom'] ?? 'Fournisseur') ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="mb-3"><label class="arovia-label" for="quantite">Quantité (L) *</label><input id="quantite" name="quantite" type="number" step="0.01" class="arovia-input" placeholder="0.00" required/></div>
+          <div class="mb-3"><label class="arovia-label" for="prix_unitaire">Prix unitaire (Ar/L) *</label><input id="prix_unitaire" name="prix_unitaire" type="number" step="0.01" class="arovia-input" placeholder="0" required/></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn-outline-gold" data-bs-dismiss="modal">Annuler</button><button type="submit" class="btn-gold">Enregistrer</button></div>
+      </form>
     </div>
   </div>
 </div>

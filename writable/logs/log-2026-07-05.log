@@ -1,0 +1,22 @@
+CRITICAL - 2026-07-05 11:58:20 --> TypeError: implode(): Argument #1 ($separator) must be of type string, array given
+[Method: GET, Route: transformations]
+in APPPATH\Models\TransformationModel.php on line 74.
+ 1 APPPATH\Models\TransformationModel.php(74): implode([...], ', ')
+ 2 APPPATH\Controllers\Transformations.php(27): App\Models\TransformationModel->getHistorique()
+ 3 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\Transformations->index()
+ 4 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Transformations))
+ 5 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-07-05 12:12:24 --> TypeError: implode(): Argument #1 ($separator) must be of type string, array given
+[Method: GET, Route: transformations]
+in APPPATH\Models\TransformationModel.php on line 74.
+ 1 APPPATH\Models\TransformationModel.php(74): implode([...], ', ')
+ 2 APPPATH\Controllers\Transformations.php(27): App\Models\TransformationModel->getHistorique()
+ 3 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\Transformations->index()
+ 4 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Transformations))
+ 5 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))

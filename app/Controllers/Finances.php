@@ -25,6 +25,8 @@ class Finances extends BaseController
         $data['transactions'] = $this->financeModel->getTransactions($type, $dateDebut, $dateFin);
         $data['solde']        = $this->financeModel->getSolde();
         $data['filtre_type']  = $type;
+        $data['totaux_mois']  = $this->financeModel->getTotauxParPeriode(date('Y-m-01'), date('Y-m-d'));
+        $data['mouvements_recents'] = $this->financeModel->getMouvementsRecents(5);
 
         return view('finances/index', $data);
     }
