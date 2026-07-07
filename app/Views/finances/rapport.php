@@ -1,62 +1,74 @@
-<?= view('partials/header') ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rapports financiers — Miel Arovia</title>
+  <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.css"/>
+  <link rel="stylesheet" href="assets/css/global.css"/>
+</head>
+<body>
+<?php include 'utils/header.php'; ?>
+<?php include 'utils/side_bar.php'; ?>
+<main class="main-wrapper">
+  <div class="breadcrumb-bar"><a href="/finances">Finance</a> <span>›</span> Rapports & Analyses</div>
+  <div class="page-header">
+    <h1 class="page-title">Rapports & Analyses</h1>
+    <a href="/finances" class="btn-outline-gold"><i class="fa fa-arrow-left"></i> Retour</a>
+  </div>
 
-<h1>Rapports & Analyses</h1>
+  <div class="content-card mb-4">
+    <form method="get" action="/finances/rapport" class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="arovia-label" for="date_debut">Du</label>
+        <input id="date_debut" type="date" name="date_debut" class="arovia-input" value="<?= esc($dateDebut ?? '') ?>"/>
+      </div>
+      <div class="col-md-4">
+        <label class="arovia-label" for="date_fin">Au</label>
+        <input id="date_fin" type="date" name="date_fin" class="arovia-input" value="<?= esc($dateFin ?? '') ?>"/>
+      </div>
+      <div class="col-md-4">
+        <button type="submit" class="btn-gold"><i class="fa fa-filter"></i> Générer</button>
+      </div>
+    </form>
+  </div>
 
-<!-- Filtre période -->
-<form method="get" action="/finances/rapport">
-    <label>Du</label>
-    <input type="date" name="date_debut" value="<?= $dateDebut ?>">
-    <label>Au</label>
-    <input type="date" name="date_fin" value="<?= $dateFin ?>">
-    <button type="submit">Générer</button>
-</form>
+  <div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap green"><i class="fa fa-arrow-up"></i></div><div class="kpi-label">Total recettes</div><div class="kpi-value green"><?= number_format($totaux['recettes'] ?? 0, 2) ?> Ar</div></div></div>
+    <div class="col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap red"><i class="fa fa-arrow-down"></i></div><div class="kpi-label">Total dépenses</div><div class="kpi-value red"><?= number_format($totaux['depenses'] ?? 0, 2) ?> Ar</div></div></div>
+    <div class="col-md-4"><div class="kpi-card"><div class="kpi-icon-wrap gold"><i class="fa fa-scale-balanced"></i></div><div class="kpi-label">Bénéfice net</div><div class="kpi-value gold"><?= number_format($totaux['benefice'] ?? 0, 2) ?> Ar</div></div></div>
+  </div>
 
-<!-- Bilan -->
-<h2>Bilan du <?= $dateDebut ?> au <?= $dateFin ?></h2>
-<p><strong>Total recettes :</strong> <?= number_format($totaux['recettes'], 2) ?> Ar</p>
-<p><strong>Total dépenses :</strong> <?= number_format($totaux['depenses'], 2) ?> Ar</p>
-<p><strong>Bénéfice net :</strong> <?= number_format($totaux['benefice'], 2) ?> Ar</p>
-
-<!-- Graphique évolution mensuelle -->
-<h2>Évolution mensuelle</h2>
-<canvas id="evolutionChart"></canvas>
-
+  <div class="content-card">
+    <div class="content-card-title">Évolution mensuelle</div>
+    <canvas id="evolutionChart"></canvas>
+  </div>
+</main>
+<script src="assets/bootstrap/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
-const evolution = <?= json_encode($evolution) ?>;
-
+const evolution = <?= json_encode($evolution ?? []) ?>;
 const mois = [...new Set(evolution.map(e => e.mois))].sort();
-
 const recettes = mois.map(m => {
-    const found = evolution.find(e => e.mois === m && e.type === 'recette');
-    return found ? parseFloat(found.total) : 0;
+  const found = evolution.find(e => e.mois === m && e.type === 'recette');
+  return found ? parseFloat(found.total) : 0;
 });
-
 const depenses = mois.map(m => {
-    const found = evolution.find(e => e.mois === m && e.type === 'depense');
-    return found ? parseFloat(found.total) : 0;
+  const found = evolution.find(e => e.mois === m && e.type === 'depense');
+  return found ? parseFloat(found.total) : 0;
 });
 
 new Chart(document.getElementById('evolutionChart'), {
-    type: 'bar',
-    data: {
-        labels: mois,
-        datasets: [
-            {
-                label: 'Recettes',
-                data: recettes,
-                backgroundColor: '#4CAF50',
-            },
-            {
-                label: 'Dépenses',
-                data: depenses,
-                backgroundColor: '#FF5722',
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        scales: { y: { beginAtZero: true } }
-    }
+  type: 'bar',
+  data: {
+    labels: mois,
+    datasets: [
+      { label: 'Recettes', data: recettes, backgroundColor: '#5D7A2E' },
+      { label: 'Dépenses', data: depenses, backgroundColor: '#C0392B' }
+    ]
+  },
+  options: { responsive: true, scales: { y: { beginAtZero: true } } }
 });
 </script>
+</body>
+</html>

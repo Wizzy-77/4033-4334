@@ -1,4 +1,17 @@
-<?= view('header', ['titre' => $titre]) ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Gestion de contrat — Miel Arovia</title>
+  <link rel="stylesheet" href="/assets/bootstrap/bootstrap.min.css"/>
+  <link rel="stylesheet" href="/assets/css/global.css"/>
+  <link rel="stylesheet" href="/assets/css/employes.css"/>
+
+</head>
+
+<?php include 'utils/header.php'; ?>
+<?php include 'utils/side_bar.php'; ?>
+<body>
 
 <div class="page-entete">
     <h1>Contrat #<?= esc($contrat['id']) ?> — <?= esc($contrat['sujet']) ?></h1>
@@ -47,4 +60,4 @@
 
 </div>
 
-<?= view('footer') ?>
+<!-- <?= view('footer') ?> -->

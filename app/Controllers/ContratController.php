@@ -79,11 +79,12 @@ class ContratController extends BaseController
     
     public function index()
     {
-        return view('contrat/index', [
+        $data = [
             'titre'    => 'Contrats',
             'contrats' => $this->contratModel->getListe(),
             'statuts'  => $this->statutModel->findAll(),
-        ]);
+        ];
+        return view('contrat/index', $data);
     }
 
     public function liste()

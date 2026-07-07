@@ -52,7 +52,7 @@ class ContratModel extends Model
 
         $builder = $this->db->table($tables['contrat'] . ' c');
 
-        $builder->select('c.id, c.sujet, c.date_creation, e.nom AS entreprise_nom, s.id AS statut_id, s.nom AS statut_nom');
+        $builder->select('c.id, c.sujet,c.date_signature,c.date_expiration, c.date_creation, e.nom AS entreprise_nom, s.id AS statut_id, s.nom AS statut_nom');
         $builder->join($tables['entreprise'] . ' e', 'e.id = c.entreprise_id');
         $builder->join($tables['statut'] . ' s', 's.id = c.statut_id');
 

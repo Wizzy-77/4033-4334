@@ -71,7 +71,7 @@ class TransformationModel extends Model
 
             $transformation['total_bocaux'] = $detailsTransformation['total_bocaux'];
             $transformation['volume_bocal_litres'] = $detailsTransformation['volume_bocal_litres'];
-            $transformation['bocal_noms'] = implode(array_unique($detailsTransformation['bocal_noms']), ', ');
+            $transformation['bocal_noms'] = implode(array_unique($detailsTransformation['bocal_noms']));
             if ($transformation['bocal_noms'] === '') {
                 $transformation['bocal_noms'] = '—';
             }

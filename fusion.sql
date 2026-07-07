@@ -78,6 +78,7 @@ CREATE TABLE planning (
 );
 
 -- novaiko le tableau contrats de napiako tableau entreprise sy statut xxxxxxxxxxxxxxxx
+
 DROP TABLE contrats CASCADE;
 
 CREATE TABLE contrats (

@@ -56,6 +56,7 @@ $routes->get('sorties/new', 'Sorties::new');
 $routes->post('sorties', 'Sorties::create');
 $routes->get('statistiques', 'Statistiques::index');
 $routes->get('valeur-stock', 'ValeurStock::index');
+$routes->get('valeur-stock/export', 'ValeurStock::export');
 
 //Arinala
 

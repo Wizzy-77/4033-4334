@@ -4,8 +4,10 @@
   <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Gestion de contrat — Miel Arovia</title>
   <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="assets/css/global.css"/>
-  <link rel="stylesheet" href="assets/css/contrats.css"/>
+  <link rel="stylesheet" href="assets/css/employes.css"/>
+
 </head>
 <body>
 <?php include 'utils/header.php'; ?>
@@ -67,6 +69,7 @@
     </div>
   </div>
 </div>
+<script src="assets/bootstrap/bootstrap.bundle.min.js"></script>
 <script>function toggleSubmenu(el){el.classList.toggle('open');el.nextElementSibling.classList.toggle('open');}</script>
 </body>
 </html>

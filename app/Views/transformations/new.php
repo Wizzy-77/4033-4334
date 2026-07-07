@@ -1,67 +1,88 @@
-<?= view('partials/header') ?>
-<h1>Nouvelle transformation</h1>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nouvelle transformation — Miel Arovia</title>
+  <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="assets/css/global.css"/>
+</head>
+<body>
+<?php include 'utils/header.php'; ?>
+<?php include 'utils/side_bar.php'; ?>
+<main class="main-wrapper">
+  <div class="breadcrumb-bar"><a href="/transformations">Gestion de stock</a> <span>›</span> Nouvelle transformation</div>
+  <div class="page-header">
+    <h1 class="page-title">Nouvelle transformation</h1>
+    <a href="/transformations" class="btn-outline-gold"><i class="fa fa-arrow-left"></i> Retour</a>
+  </div>
 
-<?php if (session()->getFlashdata('errors')): ?>
-    <ul style="color: red;">
-        <?php foreach (session()->getFlashdata('errors') as $error): ?>
+  <div class="content-card" style="max-width: 760px;">
+    <?php if (session()->getFlashdata('errors')): ?>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <?php foreach (session()->getFlashdata('errors') as $error): ?>
             <li><?= esc($error) ?></li>
-        <?php endforeach; ?>
-    </ul>
-<?php endif; ?>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+    <?php endif; ?>
 
-<p>Stock disponible : <strong id="stock-disponible"><?= number_format($stockMP['quantite_litres'], 2) ?></strong> L</p>
+    <div class="mb-3">
+      <span class="badge-arovia badge-green">Stock disponible : <?= number_format($stockMP['quantite_litres'] ?? 0, 2) ?> L</span>
+    </div>
 
-<form action="/transformations" method="post">
-    <?= csrf_field() ?>
+    <form action="/transformations" method="post">
+      <?= csrf_field() ?>
+      <?php foreach ($typesBocaux as $type): ?>
+        <div class="mb-3">
+          <label class="arovia-label" for="quantite_<?= (int) ($type['id'] ?? 0) ?>">
+            <?= esc($type['nom'] ?? 'Bocal') ?> (<?= (float) ($type['volume_litres'] ?? 0) ?> L/bocal — <?= esc($type['cible'] ?? '') ?>)
+          </label>
+          <input id="quantite_<?= (int) ($type['id'] ?? 0) ?>" type="number" min="0" class="arovia-input qte-bocal" name="quantite_<?= (int) ($type['id'] ?? 0) ?>" data-volume="<?= (float) ($type['volume_litres'] ?? 0) ?>" value="0"/>
+        </div>
+      <?php endforeach; ?>
 
-    <?php foreach ($typesBocaux as $type): ?>
-        <label>
-            <?= esc($type['nom']) ?> (<?= $type['volume_litres'] ?> L/bocal — <?= esc($type['cible']) ?>) :
-        </label><br>
-        <input
-            type="number"
-            min="0"
-            class="qte-bocal"
-            name="quantite_<?= $type['id'] ?>"
-            data-volume="<?= $type['volume_litres'] ?>"
-            value="0"
-        ><br><br>
-    <?php endforeach; ?>
+      <div class="mb-3">
+        <strong>Volume total nécessaire : </strong><span id="volume-necessaire">0.00</span> L
+      </div>
+      <div id="volume-restant-msg" class="text-muted"></div>
 
-    <p>Volume total nécessaire : <strong id="volume-necessaire">0.00</strong> L</p>
-    <p id="volume-restant-msg"></p>
-
-    <button type="submit">Valider la transformation</button>
-</form>
-
-<br>
-<a href="/transformations">Retour</a>
-
+      <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn-gold">Valider la transformation</button>
+      </div>
+    </form>
+  </div>
+</main>
+<script src="assets/bootstrap/bootstrap.bundle.min.js"></script>
 <script>
-const stockDisponible = <?= $stockMP['quantite_litres'] ?>;
+const stockDisponible = <?= (float) ($stockMP['quantite_litres'] ?? 0) ?>;
 const champs = document.querySelectorAll('.qte-bocal');
 const volumeNecessaireEl = document.getElementById('volume-necessaire');
 const messageEl = document.getElementById('volume-restant-msg');
 
 function recalculer() {
-    let total = 0;
-    champs.forEach(champ => {
-        const quantite = parseFloat(champ.value) || 0;
-        const volume = parseFloat(champ.dataset.volume);
-        total += quantite * volume;
-    });
+  let total = 0;
+  champs.forEach(champ => {
+    const quantite = parseFloat(champ.value) || 0;
+    const volume = parseFloat(champ.dataset.volume) || 0;
+    total += quantite * volume;
+  });
 
-    volumeNecessaireEl.textContent = total.toFixed(2);
+  volumeNecessaireEl.textContent = total.toFixed(2);
 
-    const restant = stockDisponible - total;
-    if (restant < 0) {
-        messageEl.textContent = 'Stock insuffisant ! Il manque ' + Math.abs(restant).toFixed(2) + ' L.';
-        messageEl.style.color = 'red';
-    } else {
-        messageEl.textContent = 'Il restera ' + restant.toFixed(2) + ' L après cette transformation.';
-        messageEl.style.color = 'green';
-    }
+  const restant = stockDisponible - total;
+  if (restant < 0) {
+    messageEl.textContent = 'Stock insuffisant ! Il manque ' + Math.abs(restant).toFixed(2) + ' L.';
+    messageEl.className = 'text-danger';
+  } else {
+    messageEl.textContent = 'Il restera ' + restant.toFixed(2) + ' L après cette transformation.';
+    messageEl.className = 'text-success';
+  }
 }
 
 champs.forEach(champ => champ.addEventListener('input', recalculer));
 </script>
+</body>
+</html>
