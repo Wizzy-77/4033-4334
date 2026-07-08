@@ -5,8 +5,12 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+$routes->get('/', 'AuthController::index');     // Affichage simple
+$routes->post('login', 'AuthController::login'); // Traitement du formulaire
+$routes->get('logout', 'AuthController::logout');
+
 $routes->get('/dashboard', 'Home::dashboard');
+$routes->get('/home', 'Home::index');
 
 
 $routes->get('livraisons', 'LivraisonController::index');
