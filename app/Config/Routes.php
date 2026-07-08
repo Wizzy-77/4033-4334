@@ -10,7 +10,11 @@ $routes->post('login', 'AuthController::login'); // Traitement du formulaire
 $routes->get('logout', 'AuthController::logout');
 
 $routes->get('/dashboard', 'Home::dashboard');
-$routes->get('/home', 'Home::index');
+$routes->get('home', 'Home::index');
+
+$routes->get('pro','ProfilController::index');
+$routes->get('profil','ProfilController::index');
+$routes->post('profil/update', 'ProfilController::update');
 
 
 $routes->get('livraisons', 'LivraisonController::index');

@@ -79,3 +79,17 @@ in APPPATH\Controllers\AuthController.php on line 23.
  4 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
  5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
  6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-07-08 07:50:07 --> Error: Call to undefined function arovia_url()
+[Method: GET, Route: fournisseurs]
+in FCPATH\utils\header.php on line 2.
+ 1 APPPATH\Views\fournisseurs\index.php(15): include()
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\Users\\Harena\\Documents\\MmeBaovola\\AROVIA_fusion\\app\\Views\\fournisseurs\\index.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->{closure:CodeIgniter\View\View::render():237}()
+ 4 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('fournisseurs/index', [], true)
+ 5 APPPATH\Controllers\Fournisseurs.php(19): view('fournisseurs/index', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\Fournisseurs->index()
+ 7 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Fournisseurs))
+ 8 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
