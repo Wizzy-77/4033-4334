@@ -138,3 +138,21 @@ in APPPATH\Views\profil\index.php on line 13.
 10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
 11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
 12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-07-08 13:15:07 --> Error: Class "Dompdf\Options" not found
+[Method: GET, Route: valeur-stock/export-pdf]
+in APPPATH\Controllers\ValeurStock.php on line 48.
+ 1 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\ValeurStock->exportPdf()
+ 2 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ValeurStock))
+ 3 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-07-08 13:20:36 --> Error: Class "Dompdf\Options" not found
+[Method: GET, Route: valeur-stock/export-pdf]
+in APPPATH\Controllers\ValeurStock.php on line 48.
+ 1 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\ValeurStock->exportPdf()
+ 2 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ValeurStock))
+ 3 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
