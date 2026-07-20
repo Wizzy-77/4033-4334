@@ -1,4 +1,4 @@
-# Répartition des travaux - Opérateur
+# Répartition des travaux Exam S4
 
 ## Version 1 (v1)
 
@@ -12,4 +12,7 @@
 - Développement du module d'Authentification 
 - Développement du module Client 
 - Implémentation des transactions : Dépôt, Retrait avec calcul de frais, Transfert inter-comptes.
+
+
+### 4033 - 4334
 - Intégration de l'interface client Bootstrap (`dashboard.php`) et affichage de l'historique des opérations.
