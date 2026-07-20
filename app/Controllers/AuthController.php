@@ -55,7 +55,7 @@ class AuthController extends BaseController
 if (!$client) {
     $clientId = $clientModel->insert([
         'telephone' => $telephone,
-        'solde'     => 1000000.0 // Solde initial mis à 1 000 000 Ar
+        'solde'     => 0 
     ]);
     $client = $clientModel->find($clientId);
 }

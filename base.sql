@@ -58,3 +58,15 @@ INSERT INTO bareme_frais (id_type_operation, montant_min, montant_max, frais) VA
 (3, 1000, 10000, 100),
 (3, 10001, 50000, 300),
 (3, 50001, 100000, 800);
+
+ALTER TABLE prefixe ADD COLUMN nom_operateur VARCHAR(50);
+
+DELETE FROM prefixe;
+
+INSERT INTO prefixe (code, nom_operateur) VALUES 
+('034', 'telma'),
+('038', 'telma'),
+('032', 'orange'),
+('037', 'orange'),
+('033', 'airtel'),
+('035', 'airtel');

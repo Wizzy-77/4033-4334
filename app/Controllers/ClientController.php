@@ -6,7 +6,6 @@ use App\Models\ClientModel;
 
 class ClientController extends BaseController
 {
-    // Affiche le tableau de bord client et l'historique de ses transactions
     public function dashboard()
     {
         if (session()->get('role') !== 'client') {
@@ -19,12 +18,17 @@ class ClientController extends BaseController
 
         $db = \Config\Database::connect();
 
-        // 1. Récupérer les types d'opérations (Dépôt, Retrait, Transfert)
+        // 1. Types d'opérations
         $types = $db->table('type_operation')->get()->getResultArray();
 
-        // 2. Récupérer l'historique des transactions du client (envoyées ou reçues)
+        // 2. Historique des transactions
         $transactions = $db->table('transaction_log')
-            ->select('transaction_log.*, type_operation.nom as type_nom, c1.telephone as source_tel, c2.telephone as dest_tel')
+            ->select('
+                transaction_log.*, 
+                type_operation.nom as type_nom, 
+                c1.telephone as source_tel, 
+                COALESCE(c2.telephone, transaction_log.telephone_dest) as dest_tel
+            ')
             ->join('type_operation', 'type_operation.id = transaction_log.id_type_operation')
             ->join('client c1', 'c1.id = transaction_log.id_client_source')
             ->join('client c2', 'c2.id = transaction_log.id_client_dest', 'left')
@@ -40,17 +44,17 @@ class ClientController extends BaseController
         ]);
     }
 
-    // Traitement des opérations (Dépôt, Retrait, Transfert)
     public function transaction()
     {
         if (session()->get('role') !== 'client') {
             return redirect()->to('/');
         }
 
-        $clientId     = session()->get('client_id');
-        $typeId       = $this->request->getPost('id_type_operation');
-        $montant      = (float) $this->request->getPost('montant');
-        $destPhone    = trim($this->request->getPost('destinataire') ?? '');
+        $clientId       = session()->get('client_id');
+        $typeId         = $this->request->getPost('id_type_operation');
+        $montant        = (float) $this->request->getPost('montant');
+        $destPhone      = trim($this->request->getPost('destinataire') ?? '');
+        $inclureRetrait = $this->request->getPost('inclure_frais_retrait') ? true : false;
 
         if ($montant <= 0) {
             return redirect()->back()->with('error', 'Le montant doit être supérieur à 0.');
@@ -60,7 +64,6 @@ class ClientController extends BaseController
         $clientModel = new ClientModel();
         $clientSource = $clientModel->find($clientId);
 
-        // Récupérer le type d'opération
         $typeOp = $db->table('type_operation')->where('id', $typeId)->get()->getRowArray();
         if (!$typeOp) {
             return redirect()->back()->with('error', 'Type d\'opération invalide.');
@@ -68,7 +71,7 @@ class ClientController extends BaseController
 
         $typeNom = strtolower($typeOp['nom']);
 
-        // --- CALCUL DES FRAIS SELON LE BARÈME ---
+        // --- CALCUL DES FRAIS DE BASE DE L'OPÉRATION ---
         $bareme = $db->table('bareme_frais')
             ->where('id_type_operation', $typeId)
             ->where('montant_min <=', $montant)
@@ -78,60 +81,178 @@ class ClientController extends BaseController
         $frais = $bareme ? (float) $bareme['frais'] : 0.0;
         $destId = null;
 
-        // --- LOGIQUE SELON LE TYPE D'OPÉRATION ---
-
         // 1. DÉPÔT
         if (str_contains($typeNom, 'dépôt') || str_contains($typeNom, 'depot')) {
             $nouveauSolde = $clientSource['solde'] + $montant;
             $clientModel->update($clientId, ['solde' => $nouveauSolde]);
+
+            // Historisation dépôt
+            $db->table('transaction_log')->insert([
+                'id_type_operation' => $typeId,
+                'id_client_source'  => $clientId,
+                'id_client_dest'    => null,
+                'telephone_dest'    => null,
+                'montant'           => $montant,
+                'frais'             => $frais,
+                'date_transaction'  => date('Y-m-d H:i:s')
+            ]);
         }
 
         // 2. RETRAIT
         elseif (str_contains($typeNom, 'retrait')) {
+            if (!empty($destPhone)) {
+                $prefixeSourceCode = substr($clientSource['telephone'], 0, 3);
+                $prefixeDestCode   = substr($destPhone, 0, 3);
+
+                $isSourceLocal = $db->table('prefixe')->where('code', $prefixeSourceCode)->countAllResults() > 0;
+                $isDestLocal   = $db->table('prefixe')->where('code', $prefixeDestCode)->countAllResults() > 0;
+
+                if (!$isSourceLocal || !$isDestLocal) {
+                    $frais = $frais * 1.10;
+                }
+            }
+
             $totalA_Debiter = $montant + $frais;
             if ($clientSource['solde'] < $totalA_Debiter) {
-                return redirect()->back()->with('error', "Solde insuffisant (Montant + Frais = $totalA_Debiter Ar).");
+                return redirect()->back()->with('error', "Solde insuffisant (Montant + Frais = " . number_format($totalA_Debiter, 2, ',', ' ') . " Ar).");
             }
 
             $nouveauSolde = $clientSource['solde'] - $totalA_Debiter;
             $clientModel->update($clientId, ['solde' => $nouveauSolde]);
+
+            // Historisation retrait
+            $db->table('transaction_log')->insert([
+                'id_type_operation' => $typeId,
+                'id_client_source'  => $clientId,
+                'id_client_dest'    => null,
+                'telephone_dest'    => !empty($destPhone) ? $destPhone : null,
+                'montant'           => $montant,
+                'frais'             => $frais,
+                'date_transaction'  => date('Y-m-d H:i:s')
+            ]);
         }
 
-        // 3. TRANSFERT
+        // 3. TRANSFERT (MULTI-DESTINATAIRES INCLUS)
         elseif (str_contains($typeNom, 'transfert')) {
             if (empty($destPhone)) {
-                return redirect()->back()->with('error', 'Veuillez saisir le numéro du destinataire.');
+                return redirect()->back()->with('error', 'Veuillez saisir au moins un numéro de destinataire.');
             }
 
-            if ($destPhone === $clientSource['telephone']) {
-                return redirect()->back()->with('error', 'Vous ne pouvez pas effectuer un transfert vers vous-même.');
+            // Extraction et nettoyage des numéros
+            $destinatairesRaw = explode(',', $destPhone);
+            $destinatairesList = [];
+            foreach ($destinatairesRaw as $d) {
+                $d = trim($d);
+                if (!empty($d)) {
+                    $destinatairesList[] = $d;
+                }
+            }
+            $destinatairesList = array_values(array_unique($destinatairesList));
+            $nbDest = count($destinatairesList);
+
+            if ($nbDest === 0) {
+                return redirect()->back()->with('error', 'Numéro(s) de destinataire invalide(s).');
             }
 
-            $destinataire = $clientModel->where('telephone', $destPhone)->first();
-            if (!$destinataire) {
-                return redirect()->back()->with('error', 'Numéro destinataire introuvable.');
+            if (in_array($clientSource['telephone'], $destinatairesList)) {
+                return redirect()->back()->with('error', 'Vous ne pouvez pas inclure votre propre numéro dans le transfert.');
             }
 
-            $totalA_Debiter = $montant + $frais;
-            if ($clientSource['solde'] < $totalA_Debiter) {
-                return redirect()->back()->with('error', "Solde insuffisant (Montant + Frais = $totalA_Debiter Ar).");
+            // Division du montant global
+            $montantParPersonne = $montant / $nbDest;
+
+            // Détection réseau de la source
+            $prefixeSourceCode = substr($clientSource['telephone'], 0, 3);
+            $isSourceLocal = $db->table('prefixe')->where('code', $prefixeSourceCode)->countAllResults() > 0;
+
+            // Type retrait pour l'option frais inclus
+            $typeRetraitId = null;
+            if ($inclureRetrait) {
+                $typeRetrait = $db->table('type_operation')->like('nom', 'retrait')->get()->getRowArray();
+                $typeRetraitId = $typeRetrait ? $typeRetrait['id'] : null;
             }
 
-            // Débit de l'expéditeur et crédit du destinataire
-            $destId = $destinataire['id'];
-            $clientModel->update($clientId, ['solde' => $clientSource['solde'] - $totalA_Debiter]);
-            $clientModel->update($destId, ['solde' => $destinataire['solde'] + $montant]);
+            $totalGeneralA_Debiter = 0;
+            $simulations = [];
+
+            // Calcul des frais par destinataire
+            foreach ($destinatairesList as $phone) {
+                // Frais de transfert
+                $baremeTransfert = $db->table('bareme_frais')
+                    ->where('id_type_operation', $typeId)
+                    ->where('montant_min <=', $montantParPersonne)
+                    ->where('montant_max >=', $montantParPersonne)
+                    ->get()->getRowArray();
+                $fraisTransfert = $baremeTransfert ? (float) $baremeTransfert['frais'] : 0.0;
+
+                // Frais de retrait facultatifs
+                $fraisRetrait = 0.0;
+                if ($inclureRetrait && $typeRetraitId) {
+                    $baremeRetrait = $db->table('bareme_frais')
+                        ->where('id_type_operation', $typeRetraitId)
+                        ->where('montant_min <=', $montantParPersonne)
+                        ->where('montant_max >=', $montantParPersonne)
+                        ->get()->getRowArray();
+                    $fraisRetrait = $baremeRetrait ? (float) $baremeRetrait['frais'] : 0.0;
+                }
+
+                // Application surtaxe inter-opérateur (+10%)
+                $prefixeDestCode = substr($phone, 0, 3);
+                $isDestLocal = $db->table('prefixe')->where('code', $prefixeDestCode)->countAllResults() > 0;
+
+                if (!$isSourceLocal || !$isDestLocal) {
+                    $fraisTransfert *= 1.10;
+                    if ($fraisRetrait > 0) {
+                        $fraisRetrait *= 1.10;
+                    }
+                }
+
+                $fraisTotaux = $fraisTransfert + $fraisRetrait;
+                $totalGeneralA_Debiter += ($montantParPersonne + $fraisTotaux);
+
+                $simulations[] = [
+                    'phone'   => $phone,
+                    'montant' => $montantParPersonne,
+                    'frais'   => $fraisTotaux
+                ];
+            }
+
+            // Vérification solde
+            if ($clientSource['solde'] < $totalGeneralA_Debiter) {
+                return redirect()->back()->with('error', "Solde insuffisant pour ce transfert groupé. Total requis (Montant + Frais) : " . number_format($totalGeneralA_Debiter, 2, ',', ' ') . " Ar.");
+            }
+
+            // Execution : Débit expéditeur
+            $nouveauSoldeExpediteur = $clientSource['solde'] - $totalGeneralA_Debiter;
+            $clientModel->update($clientId, ['solde' => $nouveauSoldeExpediteur]);
+
+            // Execution : Crédit destinataires + Historisation
+            foreach ($simulations as $sim) {
+                $destinataire = $clientModel->where('telephone', $sim['phone'])->first();
+                $destId = null;
+
+                if ($destinataire) {
+                    $destId = $destinataire['id'];
+                    $clientModel->update($destId, ['solde' => $destinataire['solde'] + $sim['montant']]);
+                }
+
+                $db->table('transaction_log')->insert([
+                    'id_type_operation' => $typeId,
+                    'id_client_source'  => $clientId,
+                    'id_client_dest'    => $destId,
+                    'telephone_dest'    => $sim['phone'],
+                    'montant'           => $sim['montant'],
+                    'frais'             => $sim['frais'],
+                    'date_transaction'  => date('Y-m-d H:i:s')
+                ]);
+            }
+
+            $messageSuccess = $nbDest > 1 
+                ? "Transfert groupé effectué vers $nbDest destinataires (" . number_format($montantParPersonne, 2, ',', ' ') . " Ar chacun)." 
+                : "Transfert effectué avec succès.";
+
+            return redirect()->to('/client/dashboard')->with('success', $messageSuccess);
         }
-
-        // Enregistrement dans l'historique log
-        $db->table('transaction_log')->insert([
-            'id_type_operation' => $typeId,
-            'id_client_source'  => $clientId,
-            'id_client_dest'    => $destId,
-            'montant'           => $montant,
-            'frais'             => $frais,
-            'date_transaction'  => date('Y-m-d H:i:s')
-        ]);
 
         return redirect()->to('/client/dashboard')->with('success', 'Opération effectuée avec succès.');
     }

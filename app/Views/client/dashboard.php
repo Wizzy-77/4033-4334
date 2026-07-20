@@ -49,7 +49,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Type d'opération :</label>
-                                <select name="id_type_operation" id="type_op" class="form-select" required onchange="toggleDestinataire()">
+                                <select name="id_type_operation" id="type_op" class="form-select" required onchange="toggleTransfertOptions()">
                                     <option value="">-- Choisir une opération --</option>
                                     <?php foreach ($types as $t): ?>
                                         <option value="<?= $t['id'] ?>" data-nom="<?= strtolower($t['nom']) ?>">
@@ -59,9 +59,19 @@
                                 </select>
                             </div>
 
+                            <!-- CHAMP DESTINATAIRE (Corrigé : sans maxlength + texte d'aide) -->
                             <div class="mb-3" id="field_destinataire" style="display: none;">
-                                <label class="form-label">Numéro du destinataire :</label>
-                                <input type="text" name="destinataire" class="form-control" placeholder="Ex: 0341234567" maxlength="10">
+                                <label class="form-label">Numéro(s) du/des destinataire(s) :</label>
+                                <input type="text" name="destinataire" id="destinataire_input" class="form-control" placeholder="0341122333, 0329988777">
+                                <div class="form-text">Pour un envoi multiple, séparez les numéros par une virgule.</div>
+                            </div>
+
+                            <!-- Option Frais de Retrait -->
+                            <div class="mb-3 form-check" id="field_frais_retrait" style="display: none;">
+                                <input class="form-check-input" type="checkbox" name="inclure_frais_retrait" value="1" id="inclure_frais_retrait">
+                                <label class="form-check-label fw-bold text-dark" for="inclure_frais_retrait">
+                                    Inclure les frais de retrait pour le destinataire
+                                </label>
                             </div>
 
                             <div class="mb-3">
@@ -115,17 +125,28 @@
 
     </div>
 
+    <!-- SCRIPT CORRIGÉ -->
     <script>
-        function toggleDestinataire() {
+        function toggleTransfertOptions() {
             var select = document.getElementById('type_op');
             var selectedOption = select.options[select.selectedIndex];
-            var nom = selectedOption.getAttribute('data-nom') || '';
+            var nom = (selectedOption.getAttribute('data-nom') || '').toLowerCase();
+            
             var destField = document.getElementById('field_destinataire');
+            var retraitField = document.getElementById('field_frais_retrait');
+            var destInput = document.getElementById('destinataire_input');
 
-            if (nom.includes('transfert')) {
+            // On vérifie si l'opération est un transfert ou un envoi
+            if (nom.includes('transfert') || nom.includes('envoi')) {
                 destField.style.display = 'block';
+                retraitField.style.display = 'block';
+                destInput.setAttribute('required', 'required');
             } else {
                 destField.style.display = 'none';
+                retraitField.style.display = 'none';
+                destInput.removeAttribute('required');
+                destInput.value = '';
+                document.getElementById('inclure_frais_retrait').checked = false;
             }
         }
     </script>

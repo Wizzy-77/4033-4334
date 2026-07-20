@@ -16,3 +16,16 @@
 
 ### 4033 - 4334
 - Intégration de l'interface client Bootstrap (`dashboard.php`) et affichage de l'historique des opérations.
+
+## Version 2 (v2)
+### 4334
+Configuration % en plus de commissions pour les transferts vers les autres opérateurs 
+Sur la page “Situation gain via les différents frais” , séparer opérateur et autres opérateurs
+Situation des montants à envoyer à chaque opérateur
+
+### 4033
+Configuration des préfixes valable pour les autres opérateurs (ex: 032 et 031, …)
+Option inclure frais de retrait lors de l’envoi
+Envoi multiple vers plusieurs numéros ( divisé le montant pour chaque numéro)
+
+

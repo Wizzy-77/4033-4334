@@ -19,17 +19,54 @@
             <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
         <?php endif; ?>
 
+        <!-- ==================== NOUVELLE SECTION STATISTIQUES & CA ==================== -->
+        <h4 class="mb-3 text-secondary">Tableau de bord financier</h4>
+        <div class="row mb-4">
+            <!-- Clients Locaux -->
+            <div class="col-md-4 mb-3">
+                <div class="card text-white bg-primary shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title text-uppercase">Clients Opérateur Local</h6>
+                        <h2 class="card-text fw-bold mb-0"><?= $nbClientsLocaux ?> <small class="fs-6 fw-normal">/ <?= $totalClients ?> clients</small></h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gains Mon Opérateur -->
+            <div class="col-md-4 mb-3">
+                <div class="card text-white bg-success shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title text-uppercase">Mon Opérateur (Gains)</h6>
+                        <h2 class="card-text fw-bold mb-0"><?= number_format($caMonOperateur, 2, ',', ' ') ?> Ar</h2>
+                        <small class="opacity-75">Frais perçus sur transactions</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commissions Autres Opérateurs -->
+            <div class="col-md-4 mb-3">
+                <div class="card text-white bg-warning shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title text-uppercase text-dark">Autres Opérateurs</h6>
+                        <h2 class="card-text fw-bold text-dark mb-0"><?= number_format($caAutresOperateurs, 2, ',', ' ') ?> Ar</h2>
+                        <small class="text-dark opacity-75">Commissions de 10% inter-opérateurs</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ============================================================================ -->
+
         <div class="row">
             <!-- GESTION DES PRÉFIXES -->
             <div class="col-md-5 mb-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0">Préfixes autorisés</h5>
+                        <h5 class="card-title mb-0">Préfixes autorisés (Opérateur Local)</h5>
                     </div>
                     <div class="card-body">
                         <form action="<?= site_url('operator/prefixe/add') ?>" method="post" class="d-flex gap-2 mb-3">
                             <?= csrf_field() ?>
-                            <input type="text" name="code" class="form-control" placeholder="Ex: 032" maxlength="3" required>
+                            <input type="text" name="code" class="form-control" placeholder="Ex: 034" maxlength="3" required>
                             <button type="submit" class="btn btn-success">Ajouter</button>
                         </form>
 
