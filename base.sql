@@ -70,3 +70,8 @@ INSERT INTO prefixe (code, nom_operateur) VALUES
 ('037', 'orange'),
 ('033', 'airtel'),
 ('035', 'airtel');
+
+ALTER TABLE client
+ADD COLUMN solde_epargne DECIMAL (15,2) NOT NULL DEFAULT 0,00 AFTER solde;
+ADD COLUMN taux_epargne DECIMAL (5,2) NOT NULL DEFAULT 0,00 AFTER solde_epargne;
+

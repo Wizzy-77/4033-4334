@@ -60,6 +60,8 @@ class ClientController extends BaseController
             return redirect()->back()->with('error', 'Le montant doit être supérieur à 0.');
         }
 
+
+        
         $db = \Config\Database::connect();
         $clientModel = new ClientModel();
         $clientSource = $clientModel->find($clientId);
@@ -79,7 +81,6 @@ class ClientController extends BaseController
             ->get()->getRowArray();
 
         $frais = $bareme ? (float) $bareme['frais'] : 0.0;
-        $destId = null;
 
         // 1. DÉPÔT
         if (str_contains($typeNom, 'dépôt') || str_contains($typeNom, 'depot')) {
@@ -108,7 +109,7 @@ class ClientController extends BaseController
                 $isDestLocal   = $db->table('prefixe')->where('code', $prefixeDestCode)->countAllResults() > 0;
 
                 if (!$isSourceLocal || !$isDestLocal) {
-                    $frais = $frais * 1.10;
+                    $frais = $frais * 1.50; // Alignement de la surtaxe à 50%
                 }
             }
 
@@ -133,7 +134,7 @@ class ClientController extends BaseController
         }
 
         // 3. TRANSFERT (MULTI-DESTINATAIRES INCLUS)
-        elseif (str_contains($typeNom, 'transfert')) {
+        elseif (str_contains($typeNom, 'transfert') || str_contains($typeNom, 'envoi')) {
             if (empty($destPhone)) {
                 return redirect()->back()->with('error', 'Veuillez saisir au moins un numéro de destinataire.');
             }
@@ -156,6 +157,17 @@ class ClientController extends BaseController
 
             if (in_array($clientSource['telephone'], $destinatairesList)) {
                 return redirect()->back()->with('error', 'Vous ne pouvez pas inclure votre propre numéro dans le transfert.');
+            }
+
+            // --- RESTRICTION : ENVOI MULTIPLE AUTORISÉ UNIQUEMENT VERS TELMA (034, 038) ---
+            if ($nbDest > 1) {
+                $prefixesTelma = ['034', '038'];
+                foreach ($destinatairesList as $phone) {
+                    $prefixe = substr($phone, 0, 3);
+                    if (!in_array($prefixe, $prefixesTelma)) {
+                        return redirect()->back()->with('error', "L'envoi multiple est uniquement autorisé vers les numéros Telma (034 ou 038). Le numéro $phone est refusé.");
+                    }
+                }
             }
 
             // Division du montant global
@@ -196,14 +208,14 @@ class ClientController extends BaseController
                     $fraisRetrait = $baremeRetrait ? (float) $baremeRetrait['frais'] : 0.0;
                 }
 
-                // Application surtaxe inter-opérateur (+10%)
+                // Application surtaxe inter-opérateur (+50%)
                 $prefixeDestCode = substr($phone, 0, 3);
                 $isDestLocal = $db->table('prefixe')->where('code', $prefixeDestCode)->countAllResults() > 0;
 
                 if (!$isSourceLocal || !$isDestLocal) {
-                    $fraisTransfert *= 1.10;
+                    $fraisTransfert *= 1.50;
                     if ($fraisRetrait > 0) {
-                        $fraisRetrait *= 1.10;
+                        $fraisRetrait *= 1.50;
                     }
                 }
 
@@ -219,7 +231,7 @@ class ClientController extends BaseController
 
             // Vérification solde
             if ($clientSource['solde'] < $totalGeneralA_Debiter) {
-                return redirect()->back()->with('error', "Solde insuffisant pour ce transfert groupé. Total requis (Montant + Frais) : " . number_format($totalGeneralA_Debiter, 2, ',', ' ') . " Ar.");
+                return redirect()->back()->with('error', "Solde insuffisant pour ce transfert. Total requis (Montant + Frais) : " . number_format($totalGeneralA_Debiter, 2, ',', ' ') . " Ar.");
             }
 
             // Execution : Débit expéditeur
@@ -248,7 +260,7 @@ class ClientController extends BaseController
             }
 
             $messageSuccess = $nbDest > 1 
-                ? "Transfert groupé effectué vers $nbDest destinataires (" . number_format($montantParPersonne, 2, ',', ' ') . " Ar chacun)." 
+                ? "Transfert groupé effectué vers $nbDest destinataires Telma (" . number_format($montantParPersonne, 2, ',', ' ') . " Ar chacun)." 
                 : "Transfert effectué avec succès.";
 
             return redirect()->to('/client/dashboard')->with('success', $messageSuccess);

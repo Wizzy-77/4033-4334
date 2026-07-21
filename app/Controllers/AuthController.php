@@ -34,7 +34,7 @@ class AuthController extends BaseController
             return redirect()->back()->with('error', 'Le numéro doit contenir 10 chiffres et commencer par 0.');
         }
 
-        // 2. Extraction du préfixe (les 3 premiers chiffres, ex: "033", "037", "032")
+        // 2. Extraction du préfixe (les 3 premiers chiffres, ex: "034", "038")
         $prefixe = substr($telephone, 0, 3);
 
         // 3. Vérification si le préfixe existe dans la table 'prefixe' (colonne 'code')
@@ -44,21 +44,21 @@ class AuthController extends BaseController
                             ->countAllResults();
 
         if ($prefixeExiste === 0) {
-            return redirect()->back()->with('error', "Le préfixe ($prefixe) n'est pas autorisé par l'opérateur.");
+            return redirect()->back()->with('error', 'Seuls les numéros Yas seront autorisés.');
         }
 
         // 4. Inscription / Création automatique du compte client s'il n'existe pas encore
         $clientModel = new ClientModel();
         $client = $clientModel->where('telephone', $telephone)->first();
 
-        // Si le client n'existe pas encore, on le crée avec 1 000 000 Ar
-if (!$client) {
-    $clientId = $clientModel->insert([
-        'telephone' => $telephone,
-        'solde'     => 0 
-    ]);
-    $client = $clientModel->find($clientId);
-}
+        // Si le client n'existe pas encore, on le crée avec 0 Ar (ou solde par défaut)
+        if (!$client) {
+            $clientId = $clientModel->insert([
+                'telephone' => $telephone,
+                'solde'     => 0 
+            ]);
+            $client = $clientModel->find($clientId);
+        }
 
         // 5. Enregistrement des informations en session et redirection
         session()->set([

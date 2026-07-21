@@ -33,3 +33,5 @@ $routes->get('/operator/prefixe/delete/(:num)', 'OperatorController::deletePrefi
 // Bareme
 $routes->post('/operator/bareme/save', 'OperatorController::saveBareme');
 $routes->get('/operator/bareme/delete/(:num)', 'OperatorController::deleteBareme/$1');
+
+

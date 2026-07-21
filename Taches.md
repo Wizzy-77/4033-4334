@@ -28,4 +28,11 @@ Configuration des préfixes valable pour les autres opérateurs (ex: 032 et 031,
 Option inclure frais de retrait lors de l’envoi
 Envoi multiple vers plusieurs numéros ( divisé le montant pour chaque numéro)
 
+## Version 3 (v3)
+### 4334
 
+### 4033
+Mettre dans la base de donnee
+Mettre une page pour epargne
+le client entre dans la page et dit combien de pourcentage
+%= 5% si il y a un trandfer reçu

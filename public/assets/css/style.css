@@ -1,0 +1,174 @@
+:root {
+    /* Couleurs Officielles YAS */
+    --yas-yellow: #FFC700;
+    --yas-yellow-hover: #E5B200;
+    --yas-navy: #0F172A;          /* Bleu Marine sombre pour fort contraste */
+    --yas-navy-hover: #1E293B;
+    --yas-bg: #F1F5F9;            /* Fond gris très doux */
+    --yas-card-bg: #FFFFFF;
+    --yas-text-muted: #64748B;
+    --yas-border: #E2E8F0;
+}
+
+/* 1. BASE & TYPOGRAPHIE */
+body {
+    background-color: var(--yas-bg);
+    color: var(--yas-navy);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Utilitaires Couleurs */
+.text-yas-navy { color: var(--yas-navy) !important; }
+.text-yas-yellow { color: var(--yas-yellow) !important; }
+.bg-yas-navy { background-color: var(--yas-navy) !important; }
+.bg-yas-yellow { background-color: var(--yas-yellow) !important; }
+
+/* 2. NAVBAR (Navigation principale) */
+.navbar-yas {
+    background-color: var(--yas-navy) !important;
+    border-bottom: 4px solid var(--yas-yellow);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.navbar-yas .navbar-brand {
+    color: #FFFFFF !important;
+}
+
+/* 3. CARTE DU SOLDE (Accent fort) */
+.card-solde {
+    background: linear-gradient(135deg, var(--yas-navy) 0%, #1E293B 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+.card-solde .solde-label {
+    color: var(--yas-yellow);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.card-solde .solde-amount {
+    color: #FFFFFF;
+    font-size: 2.2rem;
+    font-weight: 800;
+}
+
+.card-solde .solde-currency {
+    color: var(--yas-yellow);
+    font-weight: 700;
+}
+
+/* 4. CARTES STANDARDS & FORMULAIRES */
+.card-yas {
+    background-color: var(--yas-card-bg);
+    border: 1px solid var(--yas-border);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.card-yas-header {
+    background-color: var(--yas-navy);
+    color: #FFFFFF;
+    font-weight: 700;
+    border-bottom: 3px solid var(--yas-yellow);
+    padding: 14px 20px;
+}
+
+/* Carte centrée pour les pages de Connexion / Welcome */
+.welcome-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px 30px;
+    max-width: 480px;
+    width: 90%;
+    margin: 60px auto;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.1);
+    border: 1px solid var(--yas-border);
+}
+
+/* Champs de saisie */
+.form-control:focus, .form-select:focus {
+    border-color: var(--yas-yellow);
+    box-shadow: 0 0 0 0.25rem rgba(255, 199, 0, 0.25);
+}
+
+.input-group-text {
+    border-color: var(--yas-border);
+    background-color: #F8FAFC;
+    color: var(--yas-navy);
+}
+
+/* 5. BOUTONS PERSONNALISÉS */
+.btn-yas-primary, .btn-yas-client, .btn-yas-submit {
+    background-color: var(--yas-yellow) !important;
+    color: var(--yas-navy) !important;
+    font-weight: 800 !important;
+    border: none !important;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-yas-primary:hover, .btn-yas-client:hover, .btn-yas-submit:hover {
+    background-color: var(--yas-yellow-hover) !important;
+    color: var(--yas-navy) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 199, 0, 0.35);
+}
+
+.btn-yas-operator {
+    background-color: var(--yas-navy);
+    color: #FFFFFF !important;
+    font-weight: 700;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-yas-operator:hover {
+    background-color: var(--yas-navy-hover);
+    color: var(--yas-yellow) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+}
+
+/* 6. BADGES & TABLEAUX */
+.yas-badge, .badge-yas {
+    background-color: var(--yas-yellow);
+    color: var(--yas-navy);
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.table-yas thead {
+    background-color: #E2E8F0;
+    color: var(--yas-navy);
+    font-weight: 700;
+}
+
+.table-yas th {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
